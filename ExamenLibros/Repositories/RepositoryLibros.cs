@@ -1,7 +1,9 @@
 ﻿using System.Globalization;
 using ExamenLibros.Data;
 using ExamenLibros.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using static System.Net.Mime.MediaTypeNames;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ExamenLibros.Repositories
@@ -14,7 +16,36 @@ namespace ExamenLibros.Repositories
             this.context = context;
         }
 
-        
+        public async Task<List<Pedido>> GetPedidosAsync()
+        {
+            return await context.Pedidos.ToListAsync();
+        }
+
+        public async Task<Pedido> FindPedido(int idPedido)
+        {
+            return await this.context.Pedidos
+                .Where(x => x.IdUsuario == idPedido).FirstOrDefaultAsync();
+        }
+
+        public async Task<int> TramitarCompra(List<Libro> libros, int idUsuario, int pedidos, int idFactura)
+        {          
+            foreach(Libro libro in libros)
+            {
+                //int ultimoPeidoId = pedidos.Count();
+                Pedido nuevoPedido = new Pedido
+                {
+                    IdPedido = pedidos + 1,
+                    IdFactura = idFactura,
+                    Fecha = DateTime.Now.Date,
+                    IdLibro = libro.IdLibro,
+                    IdUsuario = idUsuario,
+                    Cantidad = 1
+                };
+                context.Pedidos.Add(nuevoPedido);
+                await context.SaveChangesAsync();
+            }
+            return 1;
+        }
 
         public async Task<Usuario> FindUsuarioAsync(int idUsuario)
         {
@@ -23,10 +54,17 @@ namespace ExamenLibros.Repositories
             return user;
         }
 
+        public async Task<Libro> FindLibro(int idLibro)
+        {
+            Libro libro = await this.context.Libros
+                .Where(x => x.IdLibro == idLibro).FirstOrDefaultAsync();
+            return libro;
+        }
+
         public async Task<Usuario> LogInUsuarioAsync(string nombre, string pass)
         {
             Usuario user = await this.context.Usuarios
-                .Where(x => x.Nombre == nombre && x.Pass == pass).FirstOrDefaultAsync();
+                .Where(x => x.Email == nombre && x.Pass == pass).FirstOrDefaultAsync();
             return user;
         }
 

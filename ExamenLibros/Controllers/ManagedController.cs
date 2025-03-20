@@ -52,7 +52,7 @@ namespace ExamenLibros.Controllers
                 string action = TempData["action"].ToString();
                 HttpContext.Session.SetObject("USUARIO", user);
                 // Redirige a la vista correcta
-                return RedirectToAction(action, controller);
+                return RedirectToAction("Index", "Home");
             }
             else
             {

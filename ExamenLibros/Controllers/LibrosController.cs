@@ -14,6 +14,46 @@ namespace ExamenLibros.Controllers
             this.repo = repo;
         }
 
+        public async Task<IActionResult> Compra()
+        {
+            List<int> ids = HttpContext.Session.GetObject<List<int>>("IDSLIBROS");
+            Usuario usuario = HttpContext.Session.GetObject<Usuario>("USUARIO");
+            List<Libro> libros = await this.repo.GetLibrosSessionAsync(ids);
+            List<Pedido> pedidos = await this.repo.GetPedidosAsync();
+            Pedido ultimoPedido = await this.repo.FindPedido(pedidos.Count);
+
+            this.repo.TramitarCompra(libros, usuario.IdUsuario, pedidos.Count(), ultimoPedido.IdFactura);
+            return RedirectToAction("Perfil");
+        }
+
+        public async Task<IActionResult> Details(int id)
+        {
+            Libro libro = await this.repo.FindLibro(id);
+            return View(libro);
+        }
+
+        public async Task<IActionResult> Carrito(int? id)
+        {
+            List<int> ids = HttpContext.Session.GetObject<List<int>>("IDSLIBROS");
+            if (id != null)
+            {
+                ids.Remove(id.Value);
+                //ES POSIBLE QUE YA NO TENGAMOS EMPLEADOS EN SESSION 
+                if (ids.Count == 0)
+                {
+                    //ELIMINAMOS DE SESSION NUESTRA KEY 
+                    HttpContext.Session.Remove("IDSLIBROS");
+                }
+                else
+                {
+                    //ACTUALIZAMOS SESSION CON EL EMPLEADO YA ELIMINADO 
+                    HttpContext.Session.SetObject("IDSLIBROS", ids);
+                }
+            }
+            List<Libro> libros = await this.repo.GetLibrosSessionAsync(ids);
+            return View(libros);
+        }
+
         [AuthorizeLibros]
         public async Task<IActionResult> Perfil()
         {
@@ -25,16 +65,16 @@ namespace ExamenLibros.Controllers
         {
             if (id != null)
             {
-                List<int> idsCubos;
+                List<int> idsLibros;
                 int exist = 0;
-                if (HttpContext.Session.GetObject<List<int>>("IDSCUBOS") == null)
+                if (HttpContext.Session.GetObject<List<int>>("IDSLIBROS") == null)
                 {
-                    idsCubos = new List<int>();
+                    idsLibros = new List<int>();
                 }
                 else
                 {
-                    idsCubos = HttpContext.Session.GetObject<List<int>>("IDSCUBOS");
-                    foreach (var item in idsCubos)
+                    idsLibros = HttpContext.Session.GetObject<List<int>>("IDSLIBROS");
+                    foreach (var item in idsLibros)
                     {
                         if (item == id)
                         {
@@ -44,15 +84,15 @@ namespace ExamenLibros.Controllers
                 }
                 if (exist == 0)
                 {
-                    idsCubos.Add(id.Value);
+                    idsLibros.Add(id.Value);
                 }
                 else
                 {
                     exist = 0;
                 }
 
-                HttpContext.Session.SetObject("IDSCUBOS", idsCubos);
-                ViewData["MENSAJE"] = "Cubos  almacenados: " + idsCubos.Count;
+                HttpContext.Session.SetObject("IDSLIBROS", idsLibros);
+                ViewData["MENSAJE"] = "Libros  almacenados: " + idsLibros.Count;
             }
             List<Libro> libros = await this.repo.GetLibrosAsync();
             return View(libros);
