@@ -48,9 +48,9 @@ namespace ExamenLibros.Controllers
                     CookieAuthenticationDefaults.AuthenticationScheme,
                     userPrincipal);
 
-                string controller = TempData["controller"].ToString();
-                string action = TempData["action"].ToString();
-                HttpContext.Session.SetObject("USUARIO", user);
+                //string controller = TempData["controller"].ToString();
+                //string action = TempData["action"].ToString();
+                //HttpContext.Session.SetObject("USUARIO", user);
                 // Redirige a la vista correcta
                 return RedirectToAction("Index", "Home");
             }
