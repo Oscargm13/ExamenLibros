@@ -1,0 +1,118 @@
+﻿@model List<Libro>
+@* @using ExamenLibros.Extensions *@
+@{
+    ViewData["Title"] = "Catálogo de Cubos Rubik";
+}
+@{
+    //List<int> ids = Context.Session.GetObject<List<int>>("IDSCUBOS");
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="display-4 text-primary">Catálogo de Cubos</h1>
+        <a asp-action="Create" class="btn btn-success btn-lg">
+            <i class="fas fa-plus-circle"></i> Añadir Nuevo Cubo
+        </a>
+    </div>
+
+    @* @if (ids != null)
+    {
+        <a asp-action="Carrito">Ver cubos en el carrito</a>
+    } *@
+
+    <h2>@ViewData["MENSAJE"]</h2>
+
+
+    <!-- Card view -->
+    <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4" id="cardView">
+        @foreach (var item in Model)
+        {
+            <div class="col cubo-card" data-marca="@item.Autor" data-nombre="@item.Titulo" data-precio="@item.Precio">
+                <div class="card h-100 shadow-sm hover-effect">
+                    <div class="position-relative">
+                        @if (!string.IsNullOrEmpty(item.Portada))
+                        {
+                            <img src="@item.Portada" class="card-img-top p-3" alt="@item.Titulo" style="height: 200px; object-fit: contain;">
+                        }
+                        else
+                        {
+                            <img src="/images/default-cube.png" class="card-img-top p-3" alt="Cubo sin imagen" style="height: 200px; object-fit: contain;">
+                        }
+                        <div class="position-absolute top-0 end-0 p-2">
+                            <span class="badge bg-primary rounded-pill">@item.Autor</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title text-truncate">@item.Titulo</h5>
+                        <p class="card-text text-muted small">Modelo: @item.Editorial</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="price-tag">@string.Format("{0:C}", item.Precio)</span>
+                            <div class="btn-group">
+                                <a asp-action="Index" asp-route-id="@item.IdLibro" class="btn btn-sm btn-outline-secondary">
+                                    <i class="fas fa-eye"></i>
+                                    Comprar
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- Table view (hidden by default) -->
+    <div id="tableView" class="d-none">
+        <div class="table-responsive">
+            <table class="table table-hover table-striped">
+                <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Modelo</th>
+                        <th>Marca</th>
+                        <th>Imagen</th>
+                        <th>Precio</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr class="cubo-row" data-marca="@item.Autor" data-nombre="@item.Titulo" data-precio="@item.Precio">
+                            <td>@item.IdLibro</td>
+                            <td>@item.Titulo</td>
+                            <td>@item.Editorial</td>
+                            <td>
+                                <span class="badge bg-primary">@item.Autor</span>
+                            </td>
+                            <td>
+                                @if (!string.IsNullOrEmpty(item.Portada))
+                                {
+                                    <img src="@item.Portada" alt="@item.Titulo" style="height: 50px; width: 50px; object-fit: contain;">
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Sin imagen</span>
+                                }
+                            </td>
+                            <td>@string.Format("{0:C}", item.Precio)</td>
+                            <td>
+                                <div class="btn-group">
+                                    <a asp-action="Details" asp-route-id="@item.IdLibro" class="btn btn-sm btn-info">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a asp-action="Edit" asp-route-id="@item.IdLibro" class="btn btn-sm btn-primary">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a asp-action="Delete" asp-route-id="@item.IdLibro" class="btn btn-sm btn-danger">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

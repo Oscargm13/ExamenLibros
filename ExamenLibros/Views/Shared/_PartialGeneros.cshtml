@@ -1,0 +1,12 @@
+﻿@using ExamenLibros.Extensions;
+@{
+    // List<Genero> generos = (List<Genero>) @ViewData["GENEROS"];
+    List<Genero> generos = Context.Session.GetObject<List<Genero>>("GENEROS");
+}
+<select name="cars" id="cars">
+
+    @foreach (var item in generos)
+    {
+        <option value="@item.IdGenero">@item.Nombre</option>
+    }
+</select>
